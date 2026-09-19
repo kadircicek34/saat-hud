@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Saat
+Comment=Dünya saatleri, alarm, kronometre, zamanlayıcı ve Pomodoro
+Exec=@APP_DIR@/launch-saat
+Icon=@APP_DIR@/assets/icon.png
+Terminal=false
+Categories=Utility;Clock;
+StartupNotify=true
+StartupWMClass=Saat
+Keywords=saat;alarm;kronometre;zamanlayıcı;pomodoro;clock;timer;

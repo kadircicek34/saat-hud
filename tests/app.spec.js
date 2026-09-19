@@ -1,0 +1,33 @@
+const {test,expect,_electron:electron}=require('@playwright/test');
+const path=require('node:path');
+const os=require('node:os');
+const fs=require('node:fs');
+
+test('main clock features and HUD work together',async()=>{
+  const data=fs.mkdtempSync(path.join(os.tmpdir(),'saat-ui-'));
+  const app=await electron.launch({args:['--no-sandbox',path.resolve(__dirname,'..')],env:{...process.env,SAAT_DATA_DIR:data}});
+  await app.firstWindow();
+  await expect.poll(()=>app.windows().length).toBe(2);
+  const windows=app.windows();
+  const page=windows.find(w=>w.url().endsWith('/index.html'));
+  await expect(page.getByText('Bugün nerede?')).toBeVisible();
+  await expect(page.locator('#cityList .city-card')).toHaveCount(3);
+  await page.getByRole('button',{name:'Alarmlar'}).click();
+  await page.locator('#alarmForm input[name=time]').fill('08:15');
+  await page.locator('#alarmForm input[name=label]').fill('Toplantı');
+  await page.getByRole('button',{name:'Alarm ekle'}).click();
+  await expect(page.getByText('Toplantı')).toBeVisible();
+  await page.getByRole('button',{name:'Zamanlayıcı'}).click();
+  const timerName=page.locator('#timerForm input[name=label]');
+  await timerName.fill('Makarna');
+  await expect(timerName).toHaveValue('Makarna');
+  await page.locator('#timerForm').getByRole('button',{name:'Başlat'}).click();
+  await expect(page.getByText('Makarna')).toBeVisible();
+  await page.getByRole('button',{name:'Kronometre'}).click();
+  await page.locator('#swToggle').click();
+  await page.waitForTimeout(300);
+  await expect(page.locator('#swValue')).not.toHaveText('00:00.00');
+  const hud=windows.find(w=>w.url().endsWith('/hud.html'));
+  await expect(hud.getByText('YEREL SAAT · İSTANBUL')).toBeVisible();
+  await app.close();
+});

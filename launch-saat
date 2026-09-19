@@ -1,0 +1,10 @@
+#!/bin/sh
+SCRIPT_PATH=$(readlink -f "$0")
+APP_DIR=$(dirname "$SCRIPT_PATH")
+cd "$APP_DIR" || exit 1
+
+if [ "$(id -u)" = "0" ]; then
+  exec "$APP_DIR/node_modules/.bin/electron" --no-sandbox "$APP_DIR"
+fi
+
+exec "$APP_DIR/node_modules/.bin/electron" "$APP_DIR"
